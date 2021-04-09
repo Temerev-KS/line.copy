@@ -1,0 +1,52 @@
+<?=$this->ib('header')?>
+<?php
+if($this->nFilial>0){
+  Site::badUrl();
+}else{
+  $a=$this->bd->getArr('SELECT *, ROUND(TIME_TO_SEC(TIMEDIFF(`TimeEnd`, `TimeStart`))/60) as _timeProcess FROM users WHERE `Status`="closed" ORDER BY Created, Filial');
+  if(isset($_GET['csv'])){
+    $ret='Время обращения;Кол-во в очереди;Начало работы;Время ожидания (сек.);Время приема (мин.);Тип услуги;№ центра;№ рабочего места;'."\r\n";
+    foreach($a as $row){
+      $ret.=$row['Created'].';'.$row['CountAll'].';'.$row['TimeStart'].';'.$row['TimeWait'].';'.$row['_timeProcess'].';'.$this->getTypeTitle($row['Type']).';'.$row['Filial'].';'.$row['Position'].';'."\r\n";
+    }
+    $ret=iconv("utf-8","windows-1251",$ret);
+    file_put_contents(SITE_DIR.'/export.csv', $ret);
+    header('Location: http://'.$_SERVER['HTTP_HOST'].'/export.csv');
+  }else{
+    $ret='
+    <center style="margin:30px"><a href="?csv">Сформировать csv</a></center>
+    <table id="oq_satat">
+    <tr>
+      <th>Время обращения</th>
+      <th>Кол-во в очереди</th>
+      <th>Начало работы</th>
+      <th>Время ожидания (сек.)</th>
+      <th>Время приема (мин.)</th>
+      <th>Тип услуги</th>
+      <th>№ центра </th>
+      <th>№ рабочего места</th>
+    </tr>
+    ';
+    foreach($a as $row){
+      $ret.='
+      <tr>
+        <td>'.$row['Created'].'</td>
+        <td>'.$row['CountAll'].'</td>
+        <td>'.$row['TimeStart'].'</td>
+        <td>'.$row['TimeWait'].'</td>
+        <td>'.$row['_timeProcess'].'</td>
+        <td>'.$this->getTypeTitle($row['Type']).'</td>
+        <td>'.$row['Filial'].'</td>
+        <td>'.$row['Position'].'</td>
+      </tr>
+      ';
+    }
+    $ret.='
+    </table>
+    <center style="margin-top:30px"><a href="?csv">Сформировать csv</a></center>
+    ';
+    echo $ret;
+  }
+}
+?>
+<?=$this->ib('footer')?>

@@ -1,0 +1,38 @@
+<?if(isset($_REQUEST['oUser']['ID'])){?><!DOCTYPE html>
+  <html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <title>Копицентр</title>
+    <style>
+      @charset "UTF-8";
+      @font-face {
+        font-family: "RobotoRegular";
+        src: url("/css/fonts/RobotoRegular/RobotoRegular.eot");
+        src: url("/css/fonts/RobotoRegular/RobotoRegular.eot?#iefix")format("embedded-opentype"),
+        url("/css/fonts/RobotoRegular/RobotoRegular.woff") format("woff"),
+        url("/css/fonts/RobotoRegular/RobotoRegular.ttf") format("truetype");
+        font-style: normal;
+        font-weight: normal;
+      }  
+      @font-face {
+        font-family: "RobotoBold";
+        src: url("/css/fonts/RobotoBold/RobotoBold.eot");
+        src: url("/css/fonts/RobotoBold/RobotoBold.eot?#iefix")format("embedded-opentype"),
+        url("/css/fonts/RobotoBold/RobotoBold.woff") format("woff"),
+        url("/css/fonts/RobotoBold/RobotoBold.ttf") format("truetype");
+        font-style: normal;
+        font-weight: normal;
+      }
+      center{font-family:RobotoRegular;}
+    </style>
+
+    <center style="margin-top:50px">
+      <center><img src="/pics/talon_logo.png"></center>
+      <center style="font-size: 64px;font-family:RobotoBold;"><?=$_REQUEST['oUser']['Title']?></center>
+      <center style="font-size: 10px;margin-top:25px">Пожалуйста отправляйте файлы на печать заранее:</center>
+      <center style="font-size: 30px;margin-top:5px">Ptr@OQprint.ru</center>
+      <center style="margin-top:20px"><img src="/pics/ptr-qrcode.png" alt="QR Code" width="150" height="150"></center>
+      <center style="font-size: 15px;margin-top:20px">Просто. Удобно. Надежно.</center>
+    </center>
+  </body>
+</html><?}?>

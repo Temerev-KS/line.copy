@@ -1,0 +1,13 @@
+<?=$this->ib('header')?>
+<center>
+<label><input type="password" id="oq_pass" placeholder="Пароль"/></label>
+<input type="button" id="oq_submit" value="Ok"/>
+</center>
+<script>
+$('body').on('click','#oq_submit',function(){
+  $.post('/operator/-1/login/',{'oq_pass':$('#oq_pass').val(),'ajax':'y'},function(data){
+    if(data=='y')window.location.reload();
+  });
+})
+</script>
+<?=$this->ib('footer')?>

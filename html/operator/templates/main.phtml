@@ -1,0 +1,138 @@
+<?=$this->ib('header')?>
+<div id="op_header2">
+  <div class="fr_spbetween">
+    <div class="headerlogo">Электронная очередь</div>
+    <div>
+      <label>КЦ
+        <select onchange="window.location.href='/operator/'+$(this).val()">
+          <option value="">Не выбрано</option>
+          <?foreach($this->getFilials() as $n=>$title){?>
+            <option <?=(($this->nFilial==$n)?'selected="selected"':'')?> value="<?=$n?>/"><?=$title?></option>
+          <?}?>
+        </select>
+      </label>
+      <?if(!empty($this->nFilial) and $this->nFilial>0){?>
+      <label  style="margin-left:64px">Рабочее место
+        <select id="oq_position_select">
+          <option value="">Не выбрано</option>
+          <?for($i=1;$i<=$this->getSettings('position_count');$i++){?>
+            <option <?=(($this->getSettings('position')==$i)?'selected="selected"':'')?> value="<?=$i?>"><?=$i?></option>
+          <?}?>
+        </select>
+      </label>
+      <?}?>
+    </div>
+  </div>
+</div>
+<content class="fc_top">
+  <center>
+    <div class="fc_top disabled">
+      <div id="op_current_nom">Z-123</div>
+      <div id="op_op3" class="btn4"><span>ЗАКОНЧИТЬ РАБОТУ</span></div>
+      <div id="op_op1" class="btn2"><span>СЛЕДУЮЩИЙ</span></div>
+      <div id="op_op2" class="btn3"><span>СОЗДАТЬ ТАЛОН И НАЧАТЬ РАБОТУ</span></div>
+      <table id="op_result">
+        <tr>
+          <th>№ п/п</th>
+          <th>Номер талона</th>
+        </tr>
+      </table>
+    </div>
+  </center>
+</content>
+<script>
+$(document).ready(function(){
+  $('body').on('change','#oq_position_select',function(){//номер окна
+    window.oq.setCurrentPosition($(this).val(),function(){
+      setTimeout(function(){window.location.reload(true)},200);
+    });
+  });
+  $('body').on('click','#op_op2',function(){//создать и начать
+    if(oqCheckDisabled($(this)))return false;
+    window.oq.registerUser(1,false,function(oUser){
+      window.oq.setUserStatus(oUser.data.ID,'process',window.oq.aSettings.position,function(err){console.log(err)});
+    });
+  });
+  $('body').on('click','#op_op1',function(e){
+    var _e=$('#op_result a.op_prigl[data-type=2]');
+    if(_e.length>0)_e.eq(0).trigger('click');
+		else{
+			var _e=$('#op_result a.op_prigl');
+			if(_e.length>0)_e.eq(0).trigger('click');
+		}
+    e.preventDefault();
+  });
+  $('body').on('click','a.op_prigl',function(){//пригласить
+    $this=$(this);
+    window.oq.setUserStatus($this.attr('data-userid'),'process',window.oq.aSettings.position,function(err){console.log(err)});
+  });
+  $('body').on('click','#op_op3',function(e){//закончить работу
+    window.oq.setUserStatus($(this).attr('data-id'),'closed',window.oq.aSettings.position,function(err){
+      oqSetWait();
+    });
+    e.preventDefault();
+  })
+  oqSetDisabled(true);
+  $('body').on('oqGetSettings',function(){
+      window.setInterval(function(){
+        oq.getAllUserList(function(oUserList,htmlDate){
+          //inwait
+          var _cont=$('#op_result tr').eq(0);
+          var sInwaitStr='';
+          $('#op_result tr._added').remove();
+          if(typeof(oUserList['new'])!='undefined'){
+            var k=1;
+            for(var i=0;i<oUserList['new'].length;i++){
+              if(i>=window.oq.aSettings['count_info_wait'])break;
+              sInwaitStr+='<tr class="_added"><td>'+k+'</td><td>'+oUserList['new'][i].Title+' <a data-userid="'+oUserList['new'][i].ID+'" class="op_prigl" data-type="'+oUserList['new'][i].Type+'" href="#">ПРИГЛАСИТЬ</a></td></tr>';
+              k++;
+            }
+          }
+          if(sInwaitStr=='')sInwaitStr='<tr class="_added"><td colspan="2">Нет</td></tr>';
+          $(sInwaitStr).insertAfter(_cont); 
+          //process
+          if(typeof(oUserList['process'])!='undefined'){
+            for(var i=0;i<oUserList['process'].length;i++){
+              if(oUserList['process'][i].Position==window.oq.aSettings.position){
+                oqSetProcess(oUserList['process'][i]);
+                return false;
+              }
+            }
+          }
+        }); 
+        if(window.oq._status!='process'&&typeof(window.oq.aSettings.position)!='undefined'&&window.oq.aSettings.position>0)oqSetWait();
+        else if(window.oq._status!='process')oqSetDisabled();   
+      },window.oq.aSettings['time_refrash']);    
+  });
+});
+function oqSetProcess(oUser){
+  window.oq._status='process';
+  $('#op_result').css('display','table');
+  $('.fc_top').removeClass('disabled');
+  $('#op_current_nom').css('display','block').html(oUser.Title);
+  $('#op_op3').css('display','block').attr('data-id',oUser.ID);
+  $('#op_op2,#op_op1').css('display','none');
+  $('.op_prigl').css('display','none');
+}
+function oqSetWait(){
+  window.oq._status='wait';
+  $('#op_result').css('display','table');
+  $('.fc_top').removeClass('disabled');
+  $('#op_current_nom').css('display','none');
+  $('#op_op3').css('display','none');
+  $('#op_op2,#op_op1').css('display','block');
+  $('.op_prigl').css('display','block');
+}
+function oqSetDisabled(_all){
+  window.oq._status='disabled';
+  if(typeof(_all)!='undefined')$('#op_result').css('display','none');
+  else $('#op_result').css('display','table');
+  $('#op_current_nom,#op_op3').css('display','none');
+  $('.fc_top').addClass('disabled');
+}
+function oqCheckDisabled($o){
+  if($o.parents('.disabled').length>0)return true;
+  else return false;
+}
+</script>
+<?=$this->ib('footer')?>

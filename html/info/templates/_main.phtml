@@ -1,0 +1,83 @@
+<?=$this->ib('header')?>
+<input type="hidden" value="<?=$this->nFilial?>" id="_nfilial"/>
+<content id="info_cont">
+  <div id="info_header">электронная очередЬ</div>
+  <div class="fr_spbetween" style="align-items: flex-start;margin-top: -33px;">
+    <div id="info_tbl_content">
+      <h2>В РАБОТЕ</h2>
+      <table id="info_inwork">
+        <tr>
+          <th>&nbsp;</th>
+          <th>№ ТАЛОНА</th>
+          <th>&nbsp;</th>
+          <th>ОКНО</th>
+        </tr>
+      </table>
+      <table id="info_inwait">
+        <tr>
+          <th colspan="4">
+              <h2>ожидают</h2>
+          </th>
+        </tr>
+        <tr id="info_inwait_last">
+          <td colspan="4">&nbsp;</td>
+        </tr>
+      </table>
+    </div>
+    <div class="fc_top f2" style="align-items: flex-end;">
+      <div id="info_video_content" class="fc_top" style="align-items: flex-end;align-self: center;">
+        <img src="/pics/logo_big.png"/>
+        <div style="width:1009px;height:568px;background:gray"><?=$this->getSettings('video_html')?></div>
+        <div class="info_date">
+          <div><?=date('d')?> <?=getMonthName(date('n'))?></div>
+          <div><?=date('H:i')?></div>
+        </div>
+    </div>
+  </div>
+  </div>
+</content>
+<script>
+$(document).ready(function(){
+  $('body').on('oqGetSettings',function(){
+    window.setInterval(function(){
+      oq.getAllUserList(function(oUserList,htmlDate){
+        //info_inwait
+        var sInwaitStr='';
+        var _oUserList=[];
+        var array_size=3;
+        $('#info_inwait tr._added').remove();
+        if(typeof(oUserList['new'])!='undefined'){
+          for(let i=0;i<oUserList['new'].length;i+=array_size){
+            if(i>=window.oq.aSettings['count_info_wait'])break;
+            _oUserList.push(oUserList['new'].slice(i,i+array_size));
+          }
+          for(var i=0;i<_oUserList.length;i++){
+            var s0='';s1='';s2='';
+            var b0='';b1='';b2='';
+            if(typeof(_oUserList[i][0])!='undefined')s0=_oUserList[i][0].Title;else b0='style="border-right:none"';
+            if(typeof(_oUserList[i][1])!='undefined')s1=_oUserList[i][1].Title;else b1='style="border-right:none"';
+            if(typeof(_oUserList[i][2])!='undefined')s2=_oUserList[i][2].Title;else b2='style="border-right:none"';
+            sInwaitStr+='<tr class="_added"><td>&nbsp;</td><td '+b0+'>'+s0+'</td><td '+b1+'>'+s1+'</td><td '+b2+'>'+s2+'</td></tr>';
+          };
+        }
+        if(sInwaitStr=='')sInwaitStr='<tr class="_added"><td colspan="4">Нет...</td></tr>';
+        $(sInwaitStr).insertBefore($('#info_inwait_last'));
+        //info_inwork
+        var _cont=$('#info_inwork tr').eq(0);
+        var sInwaitStr='';
+        $('#info_inwork tr._added').remove();
+        if(typeof(oUserList['process'])!='undefined'){
+          for(var i=0;i<oUserList['process'].length;i++){
+            if(i>=window.oq.aSettings['count_info_inwork'])break;
+            sInwaitStr+='<tr class="_added"><td>&nbsp;</td><td>'+oUserList['process'][i].Title+'</td><td><center class="info_arrow"></center></td><td>'+oUserList['process'][i].Position+'</td></tr>';
+          }
+        }
+        if(sInwaitStr=='')sInwaitStr='<tr class="_added"><td colspan="4">Нет</td></tr>';
+        $(sInwaitStr).insertAfter(_cont);
+        $('.info_date').html(htmlDate);
+      });
+    },window.oq.aSettings['time_refrash']);
+  });
+});
+</script>
+<?=$this->ib('footer')?>

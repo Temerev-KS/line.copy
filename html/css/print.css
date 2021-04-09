@@ -1,0 +1,22 @@
+@charset "UTF-8";
+@media print {
+  @font-face {
+    font-family: "RobotoRegular";
+    src: url("/css/fonts/RobotoRegular/RobotoRegular.eot");
+    src: url("/css/fonts/RobotoRegular/RobotoRegular.eot?#iefix")format("embedded-opentype"),
+    url("/css/fonts/RobotoRegular/RobotoRegular.woff") format("woff"),
+    url("/css/fonts/RobotoRegular/RobotoRegular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }  
+  @font-face {
+    font-family: "RobotoBold";
+    src: url("/css/fonts/RobotoBold/RobotoBold.eot");
+    src: url("/css/fonts/RobotoBold/RobotoBold.eot?#iefix")format("embedded-opentype"),
+    url("/css/fonts/RobotoBold/RobotoBold.woff") format("woff"),
+    url("/css/fonts/RobotoBold/RobotoBold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+  }
+  center{font-family:RobotoRegular;}
+}
